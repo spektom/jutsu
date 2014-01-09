@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+	<head>
+		<title>Jutsu!</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="/static/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/static/css/font-awesome.min.css" rel="stylesheet">
+		<link href="/static/css/main.css" rel="stylesheet">
+		{% block head %}{% endblock %}
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-3 col-md-3">
+					<div class="panel-group" id="accordion">
+						<div class="panel panel-default">
+							{% for category in get_categories() %}
+								<div class="panel-heading">
+									<h4 class="panel-title">
+										<a data-toggle="collapse" data-parent="#accordion" href="#collapse-{{ category }}"><span></span>{{ category }}</a>
+									</h4>
+								</div>
+								<div id="collapse-{{ category }}" class="panel-collapse collapse in">
+									<div class="panel-body">
+										<table class="table">
+											{% for plugin in get_plugins_by_category(category) if plugin.get_ui() and plugin.get_ui().get_menu_html() %}
+												<tr><td>{{ plugin.get_ui().get_menu_html()|safe }}</td></tr>
+											{% endfor %}
+										</table>
+									</div>
+								</div>
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-9 col-md-9">
+					<div class="well">
+						{% block content %}{% endblock %}
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="/static/js/jquery-1.10.2.min.js"></script>
+		<script src="/static/js/bootstrap.min.js"></script>
+		{% block body %}{% endblock %}
+	</body>
+</html>
