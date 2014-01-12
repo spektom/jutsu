@@ -1,0 +1,68 @@
+{% extends "core/base.html" %}
+
+{% block head %}
+<link href="/packages/static/css/packages.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="panel">
+	<ul class="nav nav-tabs" id="packages-tabs">
+		<li class="active"><a href="#tab-installed" data-toggle="tab">Installed packages</a></li>
+		<li><a href="#tab-available" data-toggle="tab">Available packages</a></li>
+	</ul>
+	<div class="tab-content packages-list">
+		<div class="tab-pane active" id="tab-installed">
+			<table class="table table-stripped" data-ajax-source="/packages/installed">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Version</th>
+						<th>Description</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		<div class="tab-pane" id="tab-available">
+			<table class="table table-stripped" data-ajax-source="/packages/available">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Version</th>
+						<th>Description</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block body %}
+<script>
+	$(function() {
+		function showTab(tab) {
+			table = $(tab.attr('href')).find('table');
+			table.dataTable({
+				"bInfo": false,
+				"bRetrieve": true,
+				"bProcessing": true,
+				"bServerSide": true,
+				"sAjaxSource": table.attr('data-ajax-source')
+			}).fnSetFilteringDelay(1000);
+		}
+		
+		$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+			activatedTab = e.target
+			if (activatedTab) {
+				showTab($(activatedTab));
+			}
+		});
+		
+		showTab($('#packages-tabs li.active a'));
+	});
+</script>
+{% endblock %}

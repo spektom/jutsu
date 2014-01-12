@@ -8,11 +8,16 @@ import os
 import flask
 import jinja_patch
 from jutsu.lib.plugins import get_plugins
+from jutsu.lib.db import db_session
 
 class JutsuApp(flask.Flask):
 	def __init__(self, name):
 		super(JutsuApp, self).__init__(name)
 		jinja_patch.apply_patch(self)
+		
+		@self.teardown_appcontext
+		def shutdown_session(exception=None):
+			db_session.remove()
 		
 	def send_static_file(self, filename):
 		""" Patch for solving static folder search path issue for multiple blueprints:
@@ -33,9 +38,9 @@ class JutsuApp(flask.Flask):
 				plugin_ui_module.app = self 
 				url_prefix = '/' if plugin.get_name() == "core" else '/' + plugin.get_name()
 				self.register_blueprint(plugin_ui.page, url_prefix=url_prefix)
-				
+
 		super(JutsuApp, self).run(**args)
 
 if __name__ == '__main__':
 	app = JutsuApp(__name__)
-	app.run(debug=True)
+	app.run(debug=True, use_reloader=False)
