@@ -32,7 +32,7 @@ class DebPackageManager(PackageManager):
 				package = cache[name]
 				if package.is_installed == installed:
 					for ver in package.versions:
-						res.append({'name': package.name, 'version': ver.version, 'summary': package.summary})
+						res.append({ 'name': package.name, 'version': ver.version, 'summary': package.candidate.summary })
 		return res
 
 	def list_available(self, pattern=''):

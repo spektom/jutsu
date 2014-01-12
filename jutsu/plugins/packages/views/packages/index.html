@@ -6,11 +6,11 @@
 
 {% block content %}
 <div class="panel">
-	<ul class="nav nav-tabs" id="packages-tabs">
+	<ul class="nav nav-tabs" id="packages-tabs-nav">
 		<li class="active"><a href="#tab-installed" data-toggle="tab">Installed packages</a></li>
 		<li><a href="#tab-available" data-toggle="tab">Available packages</a></li>
 	</ul>
-	<div class="tab-content packages-list">
+	<div class="tab-content" id="packages-tabs-body">
 		<div class="tab-pane active" id="tab-installed">
 			<table class="table table-stripped" data-ajax-source="/packages/installed">
 				<thead>
@@ -62,7 +62,11 @@
 			}
 		});
 		
-		showTab($('#packages-tabs li.active a'));
+		showTab($('#packages-tabs-nav li.active a'));
+		
+		$('#packages-tabs-body tbody').on('click', 'tr', function() {
+			$(this).toggleClass('row_selected');
+	    });
 	});
 </script>
 {% endblock %}

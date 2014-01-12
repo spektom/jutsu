@@ -16,6 +16,6 @@ setup(
 	install_requires=[
 		'Flask',
 		'Flask-SqlAlchemy',
-		'apt_pkg'
+		'sqlalchemy'
 	]
 )
