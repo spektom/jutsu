@@ -1,3 +1,11 @@
-.packages-list {
+#packages-tabs-body {
 	margin: 15px 10px;
+}
+
+div.DTTT_container {
+	float: left;
+}
+
+.dataTables_processing {
+	margin-left: 20px;
 }

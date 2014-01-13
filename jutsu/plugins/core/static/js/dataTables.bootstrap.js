@@ -1,11 +1,11 @@
 /* Set the defaults for DataTables initialisation */
 $.extend( true, $.fn.dataTable.defaults, {
 	"sDom":
-		"<'row'<'col-xs-6'l><'col-xs-6'f>r>"+
-		"t"+
-		"<'row'<'col-xs-6'i><'col-xs-6'p>>",
+		"<'row'<'col-xs-3'T><'col-xs-2'r><'col-xs-6'f>>t<'row top20'<'col-xs-6'il><'col-xs-6'p>>",
 	"oLanguage": {
-		"sLengthMenu": "_MENU_ records per page"
+		"sLengthMenu": "_MENU_ records per page",
+		"sSearch": "",
+		"sProcessing": "<i class='fa fa-spinner fa-spin fa-lg right'></i> Loading..."
 	}
 } );
 

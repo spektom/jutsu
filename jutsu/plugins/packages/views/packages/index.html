@@ -12,7 +12,7 @@
 	</ul>
 	<div class="tab-content" id="packages-tabs-body">
 		<div class="tab-pane active" id="tab-installed">
-			<table class="table table-stripped" data-ajax-source="/packages/installed">
+			<table class="table table-stripped" id="table-installed" data-ajax-source="/packages/installed">
 				<thead>
 					<tr>
 						<th>Name</th>
@@ -25,7 +25,7 @@
 			</table>
 		</div>
 		<div class="tab-pane" id="tab-available">
-			<table class="table table-stripped" data-ajax-source="/packages/available">
+			<table class="table table-stripped" id="table-available" data-ajax-source="/packages/available">
 				<thead>
 					<tr>
 						<th>Name</th>
@@ -44,29 +44,63 @@
 {% block body %}
 <script>
 	$(function() {
+		TableTools.BUTTONS.install = $.extend({}, TableTools.BUTTONS.select, {
+				fnClick: function(nButton, oConfig) {
+					if (this.fnGetSelected().length == 0) {
+						alert("Install: No elements are selected!")
+					}
+				}
+			}
+		);
+
+		TableTools.BUTTONS.uninstall = $.extend({}, TableTools.BUTTONS.select, {
+				fnClick: function(nButton, oConfig) {
+					if (this.fnGetSelected().length == 0) {
+						alert("Uninstall: No elements are selected!")
+					}
+				}
+			}
+		);
+
 		function showTab(tab) {
 			table = $(tab.attr('href')).find('table');
+			ajaxSource = table.attr('data-ajax-source');
+			if (ajaxSource.indexOf('available') != -1) {
+				buttons = [ {
+					"sExtends" : "install",
+					"sButtonText" : "Install"
+				} ];
+			} else {
+				buttons = [ {
+					"sExtends" : "uninstall",
+					"sButtonText" : "Uninstall"
+				} ];
+			}
 			table.dataTable({
-				"bInfo": false,
-				"bRetrieve": true,
-				"bProcessing": true,
-				"bServerSide": true,
-				"sAjaxSource": table.attr('data-ajax-source')
+				"bInfo" : false,
+				"bRetrieve" : true,
+				"bProcessing" : true,
+				"bServerSide" : true,
+				"sAjaxSource" : ajaxSource,
+				"oTableTools" : {
+					"sRowSelect": "multi",
+					"aButtons" : buttons
+				}
 			}).fnSetFilteringDelay(1000);
 		}
-		
+
 		$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
 			activatedTab = e.target
 			if (activatedTab) {
 				showTab($(activatedTab));
 			}
 		});
-		
+
 		showTab($('#packages-tabs-nav li.active a'));
-		
+
 		$('#packages-tabs-body tbody').on('click', 'tr', function() {
 			$(this).toggleClass('row_selected');
-	    });
+		});
 	});
 </script>
 {% endblock %}
