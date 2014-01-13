@@ -18,7 +18,11 @@ class PackageManager(object):
 	def list_installed(self, pattern=None):
 		raise NotImplementedError
 
+	def refresh(self):
+		raise NotImplementedError
+
 class DebPackageManager(PackageManager):
+	""" Package manager utilities for Debian based system """
 	@staticmethod
 	def is_available():
 		return PackageManager.check_available(['apt-get', '--version'])
@@ -41,7 +45,15 @@ class DebPackageManager(PackageManager):
 	def list_installed(self, pattern=''):
 		return self.list(pattern, True)
 
+	def refresh(self):
+		import apt
+		from apt.progress.base import AcquireProgress, InstallProgress
+		cache = apt.cache.Cache()
+		cache.update()
+		cache.commit(AcquireProgress(), InstallProgress())
+
 class RPMPackageManager(PackageManager):
+	""" Package manager utilities for Redhat based system """
 	@staticmethod
 	def is_available():
 		return PackageManager.check_available(['yum', '--version'])

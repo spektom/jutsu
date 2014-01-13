@@ -44,6 +44,10 @@ class PackagesUI(UI):
 		@self.page.route('/available')
 		def list_available():
 			return self.list(request, False)
+
+		@self.page.route('/refresh')
+		def refresh():
+			current.refresh()
 		
 	def get_menu_html(self):
 		return '<span class="fa fa-archive"></span><a href="/packages">Packages</a>'
