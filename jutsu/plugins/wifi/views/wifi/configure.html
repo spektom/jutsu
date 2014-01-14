@@ -16,13 +16,13 @@
 				<option value="{{ iface }}">{{ iface }}</option>
 				{% endfor %}
 			</select>
-			<i class="fa fa-spinner fa-spin hide" id="iface-spinner"></i>
 		</div>
 		<div class="form-group">
 			<label class="control-label col-md-3">SSID</label>
 			<select id="ssid" name="ssid" class="selectpicker col-md-4" data-live-search="true" disabled>
 				<option value="" default> - select SSID - </option>
 			</select>
+			<a href='javascript:void(0);' id='ssid-refresh-link'><i class='fa fa-refresh' id='ssid-refresh'></i></a>
 		</div>
 		<div class="form-group">
 			<button type="submit" class="btn btn-primary">Connect</button>
@@ -33,13 +33,12 @@
 
 {% block body %}
 <script>
-$("#iface").change(function() {
-	var iface = $(this).find('option:selected').val();
-	$("#iface-spinner").removeClass('hide');
+function refresh_ssid() {
+	var iface = $("#iface").find('option:selected').val();
+	$("#ssid-refresh").addClass('fa-spin');
 	var list = $("#ssid");
-	list.prop('disabled', true).find('option:not(:first)').remove();
+	list.prop('disabled', true).find('option:not(:first)').remove().selectpicker('refresh');
 	$.get("/wifi/scan/" + encodeURIComponent(iface), function(data) {
-		$("#iface-spinner").addClass('hide');
 		if (data.results) {
 			for (var i = 0; i < data.results.length; ++i) {
 				var ssid = data.results[i].ssid;
@@ -47,10 +46,19 @@ $("#iface").change(function() {
 					list.append("<option value='" + ssid + "'>" + ssid + "</option>");
 				}
 			}
-			list.prop('disabled', false);
 		}
-		list.selectpicker('refresh');
+	}).always(function() {
+		setTimeout(function() {
+			$("#ssid-refresh").removeClass('fa-spin');
+			list.prop('disabled', false).selectpicker('refresh');
+		}, 2000);
 	});
+}
+$("#iface").change(function() {
+	refresh_ssid();
+});
+$("#ssid-refresh-link").on('click', function() {
+	refresh_ssid();
 });
 </script>
 {% endblock %}
