@@ -1,7 +1,7 @@
 /* Set the defaults for DataTables initialisation */
 $.extend( true, $.fn.dataTable.defaults, {
 	"sDom":
-		"<'row'<'col-xs-3'T><'col-xs-2'r><'col-xs-6'f>>t<'row top20'<'col-xs-6'il><'col-xs-6'p>>",
+		"<'row'<'col-xs-4'T><'col-xs-2'r><'col-xs-6'f>>t<'row top20'<'col-xs-6'il><'col-xs-6'p>>",
 	"oLanguage": {
 		"sLengthMenu": "_MENU_ records per page",
 		"sSearch": "",
@@ -219,9 +219,9 @@ else {
 if ( $.fn.DataTable.TableTools ) {
 	// Set the classes that TableTools uses to something suitable for Bootstrap
 	$.extend( true, $.fn.DataTable.TableTools.classes, {
-		"container": "DTTT btn-group",
+		"container": "DTTT btn-toolbar",
 		"buttons": {
-			"normal": "btn btn-default",
+			"normal": "btn btn-primary",
 			"disabled": "disabled"
 		},
 		"collection": {

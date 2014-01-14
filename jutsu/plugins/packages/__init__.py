@@ -1,4 +1,2 @@
-__all__ = ['packages', 'pkg_manager']
-
-from .packages import PackagesPlugin
+from .plugin import PackagesPlugin
 instance = PackagesPlugin()

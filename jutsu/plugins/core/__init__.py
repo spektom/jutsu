@@ -1,4 +1,2 @@
-__all__ = ["core"]
-
-from .core import CorePlugin
+from .plugin import CorePlugin
 instance = CorePlugin()

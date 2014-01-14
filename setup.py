@@ -16,6 +16,7 @@ setup(
 	install_requires=[
 		'Flask',
 		'Flask-SqlAlchemy',
-		'sqlalchemy'
+		'sqlalchemy',
+		'wifi'
 	]
 )

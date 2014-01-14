@@ -1,4 +1,2 @@
-__all__ = ['wifi']
-
-from .wifi import WifiPlugin
+from .plugin import WifiPlugin
 instance = WifiPlugin()

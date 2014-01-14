@@ -1,5 +1,7 @@
 import os
 import sys
+import imp
+from pprint import pprint
 
 class Category(object):
 	""" Plug-in category """
@@ -62,11 +64,15 @@ def load_plugins():
 	except NameError:
 		plugins = []
 		plugins_path = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'plugins'))
-		sys.path.append(plugins_path)
 		for plugin_name in os.listdir(plugins_path):
 			if os.path.isdir(os.path.join(plugins_path, plugin_name)):
-				plugin = __import__(plugin_name, fromlist=['*'])
-				plugins.append(plugin.instance)
+				fp, pathname, description = imp.find_module(plugin_name, [plugins_path])
+				try:
+					plugin = imp.load_module('jutsu_plugin_%s' % plugin_name, fp, pathname, description)
+					plugins.append(plugin.instance)
+				finally:
+					if fp:
+						fp.close()
 	return plugins
 
 def get_plugins():
