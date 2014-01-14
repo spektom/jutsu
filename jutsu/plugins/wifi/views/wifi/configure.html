@@ -1,24 +1,56 @@
 {% extends "core/base.html" %}
+
+{% block head %}
+<link href="/wifi/static/css/wifi.css" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 <legend>Wi-Fi Configuration</legend>
-<div class="col-md-12">
-	<form role="form">
-		<fieldset>
-			<div class="form-group row">
-				<label for="iface" class="control-label col-md-2">Interface:</label>
-				<select id="iface" name="iface" class="col-md-2">
-					<option value="">-- choose --</option>
-					{% for iface in ifaces %}
-						<option value="{{ iface }}">{{ iface }}</option>
-					{% endfor %}
-				</select>
-			</div>
-			<div class="form-group row">
-				<div class="col-md-2">
-					<input type="submit" class="btn btn-primary" value="Update">
-				</div>
-			</div>
-		</fieldset>
-	</form>
-</div>
+<form role="form" class="form-horizontal">
+	<fieldset>
+		<div class="form-group">
+			<label for="iface" class="control-label col-md-3">Network Interface</label>
+			<select id="iface" name="iface" class="selectpicker col-md-4">
+				<option value="" default> - select network interface - </option>
+				{% for iface in ifaces %}
+				<option value="{{ iface }}">{{ iface }}</option>
+				{% endfor %}
+			</select>
+			<i class="fa fa-spinner fa-spin hide" id="iface-spinner"></i>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-md-3">SSID</label>
+			<select id="ssid" name="ssid" class="selectpicker col-md-4" data-live-search="true" disabled>
+				<option value="" default> - select SSID - </option>
+			</select>
+		</div>
+		<div class="form-group">
+			<button type="submit" class="btn btn-primary">Connect</button>
+		</div>
+	</fieldset>
+</form>
+{% endblock %}
+
+{% block body %}
+<script>
+$("#iface").change(function() {
+	var iface = $(this).find('option:selected').val();
+	$("#iface-spinner").removeClass('hide');
+	var list = $("#ssid");
+	list.prop('disabled', true).find('option:not(:first)').remove();
+	$.get("/wifi/scan/" + encodeURIComponent(iface), function(data) {
+		$("#iface-spinner").addClass('hide');
+		if (data.results) {
+			for (var i = 0; i < data.results.length; ++i) {
+				var ssid = data.results[i].ssid;
+				if (ssid) {
+					list.append("<option value='" + ssid + "'>" + ssid + "</option>");
+				}
+			}
+			list.prop('disabled', false);
+		}
+		list.selectpicker('refresh');
+	});
+});
+</script>
 {% endblock %}

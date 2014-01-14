@@ -57,7 +57,7 @@
 		TableTools.BUTTONS.reload = $.extend({}, TableTools.buttonBase, {
 				fnClick: function(nButton, oConfig) {
 					oTable = this.s.dt.oInstance;
-					$(nButton).html("<i class='fa fa-spinner fa-spin'></i> Reloading...").toggleClass("disabled");
+					$(nButton).html("<i class='fa fa-spinner fa-spin fa-1x'></i> Reloading...").toggleClass("disabled");
 					$.get("/packages/refresh").always(function() {
 						$(nButton).html("Reload").toggleClass("disabled");
 						oTable.fnClearTable(true);

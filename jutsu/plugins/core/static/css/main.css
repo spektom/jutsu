@@ -1,5 +1,7 @@
 body {
 	margin-top: 50px;
+	font-family: "Lato","proxima-nova","Helvetica Neue",Arial,sans-serif;
+	font-size: 16px;
 }
 
 .glyphicon,.fa {
@@ -21,9 +23,25 @@ body {
 .top10 {
 	margin-top: 10px;
 }
+
 .top20 {
 	margin-top: 20px;
 }
+
 .top30 {
 	margin-top: 30px;
+}
+
+* {
+	-webkit-border-radius: 0 !important;
+	-moz-border-radius: 0 !important;
+	border-radius: 0 !important;
+}
+
+form label {
+    margin-bottom: 7px !important;
+}
+
+form .row {
+    margin-bottom: 10px !important;
 }

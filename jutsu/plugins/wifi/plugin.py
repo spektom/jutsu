@@ -2,6 +2,7 @@ from jutsu.lib.plugins import Plugin
 from jutsu.lib.ui import UI
 from flask import jsonify
 from wifi import Cell
+from subprocess import Popen, PIPE, STDOUT
 
 class WifiPlugin(Plugin):
 	
@@ -24,13 +25,15 @@ class WifiUI(UI):
 		UI.setup_routes(self)
 		
 		def get_interfaces():
-			f = open('/proc/net/wireless')
 			ifaces = []
-			for line in f:
-				i = line.find(':')
-				if i != -1:
-					ifaces.append(line[:i].strip())
-			f.close()
+			proc = Popen('/sbin/iwconfig', stderr=STDOUT, stdout=PIPE)
+			while True:
+				retcode = proc.poll() #returns None while subprocess is running
+				line = proc.stdout.readline()
+				if line.find("IEEE") != -1:
+					ifaces.append(line.split(' ', 1)[0])
+				if retcode is not None:
+					break
 			return ifaces
 		
 		@self.page.route('/interfaces')
@@ -48,11 +51,15 @@ class WifiUI(UI):
 					'encrypted': cell.encrypted,
 					'channel': cell.channel,
 					'address': cell.address,
-					'mode': cell.mode
+					'mode': cell.mode,
+					'quality': cell.quality,
+					'signal': cell.signal
 				}
 				if cell.encrypted:
 					c['encryption_type'] = cell.encryption_type
 				results.append(c)
+
+			results.sort(key=lambda x: x['signal'], reverse=True)
 			return jsonify(results=results)
 
 		@self.page.route('/configure')
