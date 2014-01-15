@@ -11,21 +11,17 @@
 		<div class="form-group">
 			<label for="iface" class="control-label col-md-3">Network Interface</label>
 			<select id="iface" name="iface" class="selectpicker col-md-4">
-				<option value="" default> - select network interface - </option>
-				{% for iface in ifaces %}
-				<option value="{{ iface }}">{{ iface }}</option>
-				{% endfor %}
 			</select>
+			<a href='javascript:void(0);' id='iface-refresh-link'><i class='fa fa-refresh' id='iface-refresh'></i></a>
 		</div>
 		<div class="form-group">
 			<label class="control-label col-md-3">SSID</label>
 			<select id="ssid" name="ssid" class="selectpicker col-md-4" data-live-search="true" disabled>
-				<option value="" default> - select SSID - </option>
 			</select>
 			<a href='javascript:void(0);' id='ssid-refresh-link'><i class='fa fa-refresh' id='ssid-refresh'></i></a>
 		</div>
 		<div class="form-group">
-			<button type="submit" class="btn btn-primary">Connect</button>
+			<div class="col-md-2 col-md-offset-3"><button type="submit" class="btn btn-primary" disabled>Connect</button></div>
 		</div>
 	</fieldset>
 </form>
@@ -33,32 +29,99 @@
 
 {% block body %}
 <script>
+function get_signal_strength_percent(dBm) {
+	if (dBm <= -100)
+		return 0;
+	if (dBm >= -50)
+		return 100;
+	return Math.round(2 * (dBm + 100));
+}
+
+function get_signal_strength_style(percent) {
+	if (percent > 85) {
+		return "high";
+	}
+	if (percent > 50) {
+		return "medium"
+	}
+	if (percent > 10) {
+		return "low";
+	}
+	return "very-low";
+}
+
+function refresh_iface() {
+	$("#iface-refresh").addClass('fa-spin');
+	var list = $("#iface");
+	list.prop('disabled', true).find('option').remove().selectpicker('refresh');
+	$.get("/wifi/interfaces", function(data) {
+		if (data.ifaces) {
+			for (var i = 0; i < data.ifaces.length; ++i) {
+				var iface = data.ifaces[i];
+				list.append("<option value='" + iface + "'>" + iface + "</option>");
+			}
+			refresh_ssid();
+		}
+	}).always(function() {
+		$("#iface-refresh").removeClass('fa-spin');
+		list.prop('disabled', false).selectpicker('refresh');
+	});
+}
+
 function refresh_ssid() {
 	var iface = $("#iface").find('option:selected').val();
 	$("#ssid-refresh").addClass('fa-spin');
+	
 	var list = $("#ssid");
-	list.prop('disabled', true).find('option:not(:first)').remove().selectpicker('refresh');
+	list.prop('disabled', true).data("ssid-data", null).find('option').remove().selectpicker('refresh');
+	
 	$.get("/wifi/scan/" + encodeURIComponent(iface), function(data) {
 		if (data.results) {
+			var ssidData = {};
 			for (var i = 0; i < data.results.length; ++i) {
-				var ssid = data.results[i].ssid;
+				var cell = data.results[i];
+				var ssid = cell.ssid;
 				if (ssid) {
-					list.append("<option value='" + ssid + "'>" + ssid + "</option>");
+					ssidData[ssid] = data.results[i];
+					var percent = get_signal_strength_percent(cell.signal);
+					var style = get_signal_strength_style(percent);
+					var dataContent = '<span>' + ssid + '</span>';
+					if (cell.encrypted) {
+						dataContent += '&nbsp;&nbsp;<i class="fa fa-lock"></i>';
+					}
+					dataContent += '<i class="pull-right glyphicon glyphicon-wifi-signal ' + style + '"></i>';
+					list.append("<option data-content='" + dataContent + "' value='" + ssid + "'>" + ssid + "</option>");
 				}
 			}
+			list.data("ssid-data", ssidData);
 		}
 	}).always(function() {
-		setTimeout(function() {
-			$("#ssid-refresh").removeClass('fa-spin');
-			list.prop('disabled', false).selectpicker('refresh');
-		}, 2000);
+		$("#ssid-refresh").removeClass('fa-spin');
+		list.prop('disabled', false).selectpicker('refresh');
 	});
 }
-$("#iface").change(function() {
-	refresh_ssid();
-});
-$("#ssid-refresh-link").on('click', function() {
-	refresh_ssid();
+
+function ssid_select() {
+	var list = $("#ssid");
+	var ssid = list.find('option:selected').val();
+	var ssidData = list.data("ssid-data")[ssid];
+	alert(JSON.stringify(ssidData));
+}
+
+$(function() {
+	$("#iface").change(function() {
+		refresh_ssid();
+	});
+	$("#ssid").change(function() {
+		ssid_select();
+	});
+	$("#iface-refresh-link").on('click', function() {
+		refresh_iface();
+	});
+	$("#ssid-refresh-link").on('click', function() {
+		refresh_ssid();
+	});
+	refresh_iface();
 });
 </script>
 {% endblock %}
